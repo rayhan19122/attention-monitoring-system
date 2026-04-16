@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Smart Classroom Dashboard</title>
+  <!-- Firebase JavaScript SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <style>
+    body { font-family: sans-serif; background: #f0f4f8; margin: 0; padding: 20px; }
+    h1 { color: #1a1a2e; }
+    .card { background: white; border-radius: 12px; padding: 20px;
+            margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .score { font-size: 64px; font-weight: 700; text-align: center; }
+    .bar { height: 20px; background: #e2e8f0; border-radius: 10px; margin: 10px 0; }
+    .bar-fill { height: 100%; border-radius: 10px; transition: width 1s ease; }
+    .alert { background: #fff5f5; border: 2px solid #fc8181;
+             color: #c53030; padding: 14px; border-radius: 8px;
+             display: none; font-weight: bold; font-size: 18px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 14px;
+             border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+    th { color: #718096; font-size: 12px; text-transform: uppercase; }
+    .status-on { color: #38a169; font-weight: 600; }
+    .status-off { color: #e53e3e; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+<h1>Smart Classroom Attention Monitor</h1>
+
+<div class="alert" id="alert">
+  ⚠ Attention level is LOW! Consider engaging students.
+</div>
+
+<div class="card">
+  <h2>Current Attention Score</h2>
+  <div class="score" id="score">--</div>
+  <div class="bar">
+    <div class="bar-fill" id="bar" style="width:0%; background:#48bb78"></div>
+  </div>
+  <p>Attentive: <strong id="attentive">0</strong> &nbsp;&nbsp;
+     Distracted: <strong id="distracted">0</strong></p>
+</div>
+
+<div class="card">
+  <h2>Recent Readings</h2>
+  <table>
+    <thead><tr>
+      <th>Time</th>
+      <th>Score</th>
+      <th>Attentive</th>
+      <th>Distracted</th>
+    </tr></thead>
+    <tbody id="log"></tbody>
+  </table>
+</div>
+
+<script>
+  // ─── REPLACE WITH YOUR FIREBASE CONFIG ──────────────────
+  const firebaseConfig = {
+      apiKey: "AIzaSyB1pz-IiXW46Ic0zPYkxV2sNaQoUsSDZb8",
+      authDomain: "attention-detector.firebaseapp.com",
+      databaseURL: "https://attention-detector-default-rtdb.firebaseio.com",
+      projectId: "attention-detector"
+    };
+  // ─────────────────────────────────────────────────────────
+
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+  const ref = database.ref("classroom/session_001");
+
+  // Listen for real-time updates — this fires every time new data arrives!
+  ref.on("value", (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
+
+    // Get the most recent entry
+    const keys = Object.keys(data).sort();
+    const latest = data[keys[keys.length - 1]];
+
+    // Update the score display
+    const score = latest.attention_score || 0;
+    document.getElementById("score").textContent = score + "%";
+    document.getElementById("attentive").textContent = latest.attentive || 0;
+    document.getElementById("distracted").textContent = latest.distracted || 0;
+
+    // Update bar color based on score
+    const bar = document.getElementById("bar");
+    bar.style.width = score + "%";
+    bar.style.background = score > 70 ? "#48bb78"  // green
+                         : score > 40 ? "#ed8936"  // orange
+                         : "#fc8181";              // red
+
+    // Show alert if attention is low
+    document.getElementById("alert").style.display = score < 50 ? "block" : "none";
+
+    // Update log table (show last 10 readings)
+    const recentKeys = keys.slice(-10).reverse();
+    document.getElementById("log").innerHTML = recentKeys.map(k => {
+      const d = data[k];
+      const t = new Date(d.timestamp * 1000).toLocaleTimeString();
+      return `<tr>
+        <td>${t}</td>
+        <td><strong>${d.attention_score}%</strong></td>
+        <td class="status-on">${d.attentive}</td>
+        <td class="status-off">${d.distracted}</td>
+      </tr>`;
+    }).join("");
+  });
+</script>
+</body>
+</html>
