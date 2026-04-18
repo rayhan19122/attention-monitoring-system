@@ -112,6 +112,13 @@
       color: var(--text);
     }
 
+    .inline-error {
+      width: 100%;
+      color: #b91c1c;
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(180px, 1fr));
@@ -241,6 +248,7 @@
         <input type="date" id="start-date" aria-label="Start date">
         <input type="date" id="end-date" aria-label="End date">
         <button class="apply-btn" id="apply-custom" type="button">Apply</button>
+        <div id="custom-error" class="inline-error" aria-live="polite"></div>
       </div>
     </div>
   </div>
@@ -416,7 +424,7 @@
     document.getElementById("total-faces").textContent = attentive + distracted;
 
     const circle = document.getElementById("score-circle");
-    circle.style.setProperty("--deg", `${Math.max(0, Math.min(score, 100)) * 3.6}deg`);
+    circle.style.setProperty("--deg", `${Math.max(0, Math.min(score, 100)) * 3.6}deg`); // 100% -> 360deg
     circle.classList.remove("low", "critical");
 
     if (score < 50) {
@@ -532,6 +540,7 @@
       document.querySelectorAll(".filter-btn").forEach(el => el.classList.remove("active"));
       btn.classList.add("active");
       currentFilter = btn.dataset.filter;
+      document.getElementById("custom-error").textContent = "";
       document.getElementById("custom-range").style.display = currentFilter === "custom" ? "flex" : "none";
       refreshDashboard();
     });
@@ -540,14 +549,19 @@
   document.getElementById("apply-custom").addEventListener("click", () => {
     const start = document.getElementById("start-date").value;
     const end = document.getElementById("end-date").value;
+    const customError = document.getElementById("custom-error");
+
     if (!start || !end) {
-      window.alert("Please select both start and end dates.");
+      customError.textContent = "Please select both start and end dates.";
       return;
     }
+
     if (start > end) {
-      window.alert("Start date cannot be after end date.");
+      customError.textContent = "Start date cannot be after end date.";
       return;
     }
+
+    customError.textContent = "";
     refreshDashboard();
   });
 
