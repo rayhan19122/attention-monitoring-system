@@ -380,7 +380,7 @@
     if (currentFilter === "custom") {
       const startValue = document.getElementById("start-date").value;
       const endValue = document.getElementById("end-date").value;
-      if (!startValue || !endValue) return { start: 0, end: Number.MAX_SAFE_INTEGER };
+      if (!startValue || !endValue) return null;
 
       const start = Math.floor(new Date(startValue + "T00:00:00").getTime() / 1000);
       const end = Math.floor(new Date(endValue + "T23:59:59").getTime() / 1000);
@@ -391,7 +391,10 @@
   }
 
   function filterEntries() {
-    const { start, end } = getRange();
+    const range = getRange();
+    if (!range) return [];
+
+    const { start, end } = range;
     return allEntries.filter(item => item.timestamp >= start && item.timestamp <= end);
   }
 
@@ -449,7 +452,7 @@
   }
 
   function renderTable(filtered) {
-    const rows = filtered.slice().reverse().slice(0, 20);
+    const rows = filtered.slice().reverse().slice(0, 20); // Keep table focused on latest 20 readings
     const tbody = document.getElementById("log");
 
     if (!rows.length) {
@@ -474,7 +477,7 @@
   function renderCharts(filtered, stats) {
     if (!trendChart || !distributionChart) return;
 
-    const limited = filtered.slice(-120);
+    const limited = filtered.slice(-120); // Cap points to keep chart readable and fast
     trendChart.data.labels = limited.map(item => new Date(item.timestamp * 1000).toLocaleTimeString());
     trendChart.data.datasets[0].data = limited.map(item => Number(item.attention_score) || 0);
     trendChart.update();
@@ -563,6 +566,12 @@
 
     customError.textContent = "";
     refreshDashboard();
+  });
+
+  ["start-date", "end-date"].forEach(id => {
+    document.getElementById(id).addEventListener("change", () => {
+      document.getElementById("custom-error").textContent = "";
+    });
   });
 
   window.addEventListener("load", () => {
