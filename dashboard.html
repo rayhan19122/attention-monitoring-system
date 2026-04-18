@@ -335,6 +335,9 @@
   let currentFilter = "live";
   let trendChart;
   let distributionChart;
+  const DEGREES_PER_PERCENT = 3.6;
+  const MAX_TABLE_ROWS = 20;
+  const MAX_CHART_POINTS = 120;
 
   const periodLabel = {
     live: "Live",
@@ -427,7 +430,7 @@
     document.getElementById("total-faces").textContent = attentive + distracted;
 
     const circle = document.getElementById("score-circle");
-    circle.style.setProperty("--deg", `${Math.max(0, Math.min(score, 100)) * 3.6}deg`); // 100% -> 360deg
+    circle.style.setProperty("--deg", `${Math.max(0, Math.min(score, 100)) * DEGREES_PER_PERCENT}deg`);
     circle.classList.remove("low", "critical");
 
     if (score < 50) {
@@ -452,7 +455,7 @@
   }
 
   function renderTable(filtered) {
-    const rows = filtered.slice().reverse().slice(0, 20); // Keep table focused on latest 20 readings
+    const rows = filtered.slice().reverse().slice(0, MAX_TABLE_ROWS);
     const tbody = document.getElementById("log");
 
     if (!rows.length) {
@@ -477,7 +480,7 @@
   function renderCharts(filtered, stats) {
     if (!trendChart || !distributionChart) return;
 
-    const limited = filtered.slice(-120); // Cap points to keep chart readable and fast
+    const limited = filtered.slice(-MAX_CHART_POINTS);
     trendChart.data.labels = limited.map(item => new Date(item.timestamp * 1000).toLocaleTimeString());
     trendChart.data.datasets[0].data = limited.map(item => Number(item.attention_score) || 0);
     trendChart.update();
