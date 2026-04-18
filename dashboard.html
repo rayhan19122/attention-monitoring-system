@@ -2,111 +2,574 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Classroom Dashboard</title>
-  <!-- Firebase JavaScript SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <style>
-    body { font-family: sans-serif; background: #f0f4f8; margin: 0; padding: 20px; }
-    h1 { color: #1a1a2e; }
-    .card { background: white; border-radius: 12px; padding: 20px;
-            margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .score { font-size: 64px; font-weight: 700; text-align: center; }
-    .bar { height: 20px; background: #e2e8f0; border-radius: 10px; margin: 10px 0; }
-    .bar-fill { height: 100%; border-radius: 10px; transition: width 1s ease; }
-    .alert { background: #fff5f5; border: 2px solid #fc8181;
-             color: #c53030; padding: 14px; border-radius: 8px;
-             display: none; font-weight: bold; font-size: 18px; }
+    :root {
+      --bg: #f3f6ff;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #4f46e5;
+      --attention: #16a34a;
+      --distraction: #f59e0b;
+      --danger: #ef4444;
+      --border: #e5e7eb;
+      --shadow: 0 10px 30px rgba(79, 70, 229, 0.12);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at top right, #dde7ff, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    .header {
+      margin-bottom: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .header h1 { font-size: clamp(1.4rem, 3vw, 2.1rem); line-height: 1.2; }
+    .header p { color: var(--muted); margin-top: 6px; }
+
+    .alert {
+      display: none;
+      margin-bottom: 18px;
+      border-radius: 12px;
+      padding: 12px 14px;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      background: #fef2f2;
+      font-weight: 600;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .filters strong { margin-right: 4px; }
+
+    .filter-btn,
+    .apply-btn {
+      border: 1px solid #c7d2fe;
+      background: #eef2ff;
+      color: #3730a3;
+      border-radius: 999px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: .2s ease;
+    }
+
+    .filter-btn:hover,
+    .apply-btn:hover { transform: translateY(-1px); }
+
+    .filter-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .custom-range {
+      display: none;
+      width: 100%;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .custom-range input {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 10px;
+      color: var(--text);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .stat {
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 16px;
+    }
+
+    .stat small { color: var(--muted); font-weight: 600; }
+    .stat h3 { margin-top: 8px; font-size: clamp(1.6rem, 4vw, 2rem); }
+    .stat p { color: var(--muted); font-size: 0.87rem; margin-top: 4px; }
+
+    .stat.current h3 { color: var(--primary); }
+    .stat.attention h3 { color: var(--attention); }
+    .stat.distraction h3 { color: var(--distraction); }
+
+    .layout {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .span-2 { grid-column: span 2; }
+
+    .section-title {
+      font-size: 1.05rem;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .live-wrap {
+      display: grid;
+      place-items: center;
+      gap: 12px;
+    }
+
+    .score-circle {
+      --deg: 0deg;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--primary);
+      background: conic-gradient(var(--attention) var(--deg), #e5e7eb 0deg);
+      position: relative;
+    }
+
+    .score-circle::after {
+      content: "";
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid var(--border);
+    }
+
+    .score-circle span { position: relative; z-index: 1; }
+    .score-circle.low { background: conic-gradient(var(--distraction) var(--deg), #e5e7eb 0deg); }
+    .score-circle.critical { background: conic-gradient(var(--danger) var(--deg), #e5e7eb 0deg); }
+
+    .counts {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      justify-content: center;
+      color: var(--muted);
+    }
+
+    .counts b { display: block; color: var(--text); font-size: 1.2rem; }
+
+    .chart-area { height: 300px; }
+
     table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: 10px 14px;
-             border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-    th { color: #718096; font-size: 12px; text-transform: uppercase; }
-    .status-on { color: #38a169; font-weight: 600; }
-    .status-off { color: #e53e3e; font-weight: 600; }
+    th, td {
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 8px;
+      font-size: 0.92rem;
+    }
+    th { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+
+    .status-on { color: var(--attention); font-weight: 700; }
+    .status-off { color: var(--distraction); font-weight: 700; }
+    .status-neutral { color: var(--muted); font-weight: 700; }
+
+    .empty { text-align: center; padding: 16px; color: var(--muted); }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .span-2 { grid-column: auto; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .score-circle { width: 150px; height: 150px; }
+      .score-circle::after { width: 108px; height: 108px; }
+    }
   </style>
 </head>
 <body>
-
-<h1>Smart Classroom Attention Monitor</h1>
-
-<div class="alert" id="alert">
-  ⚠ Attention level is LOW! Consider engaging students.
-</div>
-
-<div class="card">
-  <h2>Current Attention Score</h2>
-  <div class="score" id="score">--</div>
-  <div class="bar">
-    <div class="bar-fill" id="bar" style="width:0%; background:#48bb78"></div>
+<div class="container">
+  <div class="header">
+    <div>
+      <h1>📊 Smart Classroom Dashboard</h1>
+      <p>Real-time monitoring with historical attention insights</p>
+    </div>
   </div>
-  <p>Attentive: <strong id="attentive">0</strong> &nbsp;&nbsp;
-     Distracted: <strong id="distracted">0</strong></p>
-</div>
 
-<div class="card">
-  <h2>Recent Readings</h2>
-  <table>
-    <thead><tr>
-      <th>Time</th>
-      <th>Score</th>
-      <th>Attentive</th>
-      <th>Distracted</th>
-    </tr></thead>
-    <tbody id="log"></tbody>
-  </table>
+  <div class="alert" id="alert">⚠ Attention level is LOW! Consider engaging students.</div>
+
+  <div class="card">
+    <div class="filters">
+      <strong>Timeframe</strong>
+      <button class="filter-btn active" data-filter="live">Live</button>
+      <button class="filter-btn" data-filter="hour">Last Hour</button>
+      <button class="filter-btn" data-filter="day">Last Day</button>
+      <button class="filter-btn" data-filter="week">Last Week</button>
+      <button class="filter-btn" data-filter="custom">Custom</button>
+      <div class="custom-range" id="custom-range">
+        <input type="date" id="start-date" aria-label="Start date">
+        <input type="date" id="end-date" aria-label="End date">
+        <button class="apply-btn" id="apply-custom" type="button">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat current">
+      <small>Current Score</small>
+      <h3 id="current-score">--</h3>
+      <p>Latest real-time reading</p>
+    </div>
+    <div class="stat attention">
+      <small>Total Attention %</small>
+      <h3 id="total-attention">--</h3>
+      <p id="attention-period">For Live</p>
+    </div>
+    <div class="stat distraction">
+      <small>Total Distraction %</small>
+      <h3 id="total-distraction">--</h3>
+      <p id="distraction-period">For Live</p>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="card">
+      <div class="section-title">Live Attention Score</div>
+      <div class="live-wrap">
+        <div class="score-circle" id="score-circle" style="--deg:0deg"><span id="score-value">0%</span></div>
+        <div class="counts">
+          <div><b id="attentive">0</b>Attentive</div>
+          <div><b id="distracted">0</b>Distracted</div>
+          <div><b id="total-faces">0</b>Total Faces</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Attention Distribution</div>
+      <div class="chart-area"><canvas id="distributionChart"></canvas></div>
+    </div>
+
+    <div class="card span-2">
+      <div class="section-title">Attention Trend</div>
+      <div class="chart-area"><canvas id="trendChart"></canvas></div>
+    </div>
+
+    <div class="card span-2">
+      <div class="section-title">Recent Readings</div>
+      <table>
+        <thead>
+        <tr>
+          <th>Time</th>
+          <th>Score</th>
+          <th>Attentive</th>
+          <th>Distracted</th>
+          <th>Total</th>
+        </tr>
+        </thead>
+        <tbody id="log"><tr><td colspan="5" class="empty">Waiting for data...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
-  // ─── REPLACE WITH YOUR FIREBASE CONFIG ──────────────────
   const firebaseConfig = {
-      apiKey: "AIzaSyB1pz-IiXW46Ic0zPYkxV2sNaQoUsSDZb8",
-      authDomain: "attention-detector.firebaseapp.com",
-      databaseURL: "https://attention-detector-default-rtdb.firebaseio.com",
-      projectId: "attention-detector"
+    apiKey: "AIzaSyB1pz-IiXW46Ic0zPYkxV2sNaQoUsSDZb8",
+    authDomain: "attention-detector.firebaseapp.com",
+    databaseURL: "https://attention-detector-default-rtdb.firebaseio.com",
+    projectId: "attention-detector"
+  };
+
+  const hasFirebase = typeof window.firebase !== "undefined";
+  const hasChart = typeof window.Chart !== "undefined";
+  let ref = null;
+
+  if (hasFirebase) {
+    firebase.initializeApp(firebaseConfig);
+    ref = firebase.database().ref("classroom/session_001");
+  } else {
+    console.warn("Firebase SDK unavailable. Showing dashboard without live data.");
+  }
+
+  let allEntries = [];
+  let currentFilter = "live";
+  let trendChart;
+  let distributionChart;
+
+  const periodLabel = {
+    live: "Live",
+    hour: "Last Hour",
+    day: "Last Day",
+    week: "Last Week",
+    custom: "Custom Range"
+  };
+
+  function toEntries(data) {
+    return Object.values(data || {})
+      .filter(item => item && Number.isFinite(item.timestamp))
+      .sort((a, b) => a.timestamp - b.timestamp);
+  }
+
+  function calcStats(entries) {
+    if (!entries.length) return { attentionPct: 0, distractionPct: 0 };
+
+    let attentive = 0;
+    let distracted = 0;
+
+    entries.forEach(item => {
+      attentive += Number(item.attentive) || 0;
+      distracted += Number(item.distracted) || 0;
+    });
+
+    const total = attentive + distracted;
+    if (!total) return { attentionPct: 0, distractionPct: 0 };
+
+    return {
+      attentionPct: Math.round((attentive / total) * 100),
+      distractionPct: Math.round((distracted / total) * 100)
     };
-  // ─────────────────────────────────────────────────────────
+  }
 
-  firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
-  const ref = database.ref("classroom/session_001");
+  function getRange() {
+    const now = Math.floor(Date.now() / 1000);
 
-  // Listen for real-time updates — this fires every time new data arrives!
-  ref.on("value", (snapshot) => {
-    const data = snapshot.val();
-    if (!data) return;
+    if (currentFilter === "hour") return { start: now - 3600, end: now };
+    if (currentFilter === "day") return { start: now - 86400, end: now };
+    if (currentFilter === "week") return { start: now - 604800, end: now };
 
-    // Get the most recent entry
-    const keys = Object.keys(data).sort();
-    const latest = data[keys[keys.length - 1]];
+    if (currentFilter === "custom") {
+      const startValue = document.getElementById("start-date").value;
+      const endValue = document.getElementById("end-date").value;
+      if (!startValue || !endValue) return { start: 0, end: Number.MAX_SAFE_INTEGER };
 
-    // Update the score display
-    const score = latest.attention_score || 0;
-    document.getElementById("score").textContent = score + "%";
-    document.getElementById("attentive").textContent = latest.attentive || 0;
-    document.getElementById("distracted").textContent = latest.distracted || 0;
+      const start = Math.floor(new Date(startValue + "T00:00:00").getTime() / 1000);
+      const end = Math.floor(new Date(endValue + "T23:59:59").getTime() / 1000);
+      return { start, end };
+    }
 
-    // Update bar color based on score
-    const bar = document.getElementById("bar");
-    bar.style.width = score + "%";
-    bar.style.background = score > 70 ? "#48bb78"  // green
-                         : score > 40 ? "#ed8936"  // orange
-                         : "#fc8181";              // red
+    return { start: 0, end: Number.MAX_SAFE_INTEGER };
+  }
 
-    // Show alert if attention is low
-    document.getElementById("alert").style.display = score < 50 ? "block" : "none";
+  function filterEntries() {
+    const { start, end } = getRange();
+    return allEntries.filter(item => item.timestamp >= start && item.timestamp <= end);
+  }
 
-    // Update log table (show last 10 readings)
-    const recentKeys = keys.slice(-10).reverse();
-    document.getElementById("log").innerHTML = recentKeys.map(k => {
-      const d = data[k];
-      const t = new Date(d.timestamp * 1000).toLocaleTimeString();
+  function formatTime(ts) {
+    return new Date(ts * 1000).toLocaleString();
+  }
+
+  function renderLive(latest) {
+    if (!latest) {
+      document.getElementById("current-score").textContent = "--";
+      document.getElementById("score-value").textContent = "0%";
+      document.getElementById("attentive").textContent = "0";
+      document.getElementById("distracted").textContent = "0";
+      document.getElementById("total-faces").textContent = "0";
+      const emptyCircle = document.getElementById("score-circle");
+      emptyCircle.style.setProperty("--deg", "0deg");
+      emptyCircle.classList.remove("low", "critical");
+      document.getElementById("alert").style.display = "none";
+      return;
+    }
+
+    const score = Number(latest?.attention_score) || 0;
+    const attentive = Number(latest?.attentive) || 0;
+    const distracted = Number(latest?.distracted) || 0;
+
+    document.getElementById("current-score").textContent = score + "%";
+    document.getElementById("score-value").textContent = score + "%";
+    document.getElementById("attentive").textContent = attentive;
+    document.getElementById("distracted").textContent = distracted;
+    document.getElementById("total-faces").textContent = attentive + distracted;
+
+    const circle = document.getElementById("score-circle");
+    circle.style.setProperty("--deg", `${Math.max(0, Math.min(score, 100)) * 3.6}deg`);
+    circle.classList.remove("low", "critical");
+
+    if (score < 50) {
+      circle.classList.add("critical");
+      document.getElementById("alert").style.display = "block";
+    } else if (score < 70) {
+      circle.classList.add("low");
+      document.getElementById("alert").style.display = "none";
+    } else {
+      document.getElementById("alert").style.display = "none";
+    }
+  }
+
+  function renderSummary(filtered) {
+    const stats = calcStats(filtered);
+    const label = periodLabel[currentFilter] || "Live";
+    document.getElementById("total-attention").textContent = `${stats.attentionPct}%`;
+    document.getElementById("total-distraction").textContent = `${stats.distractionPct}%`;
+    document.getElementById("attention-period").textContent = `For ${label}`;
+    document.getElementById("distraction-period").textContent = `For ${label}`;
+    return stats;
+  }
+
+  function renderTable(filtered) {
+    const rows = filtered.slice().reverse().slice(0, 20);
+    const tbody = document.getElementById("log");
+
+    if (!rows.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty">No data available for this timeframe.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = rows.map(item => {
+      const attentive = Number(item.attentive) || 0;
+      const distracted = Number(item.distracted) || 0;
+      const total = attentive + distracted;
       return `<tr>
-        <td>${t}</td>
-        <td><strong>${d.attention_score}%</strong></td>
-        <td class="status-on">${d.attentive}</td>
-        <td class="status-off">${d.distracted}</td>
+        <td>${formatTime(item.timestamp)}</td>
+        <td><strong>${Number(item.attention_score) || 0}%</strong></td>
+        <td class="status-on">${attentive}</td>
+        <td class="status-off">${distracted}</td>
+        <td class="status-neutral">${total}</td>
       </tr>`;
     }).join("");
+  }
+
+  function renderCharts(filtered, stats) {
+    if (!trendChart || !distributionChart) return;
+
+    const limited = filtered.slice(-120);
+    trendChart.data.labels = limited.map(item => new Date(item.timestamp * 1000).toLocaleTimeString());
+    trendChart.data.datasets[0].data = limited.map(item => Number(item.attention_score) || 0);
+    trendChart.update();
+
+    distributionChart.data.datasets[0].data = [stats.attentionPct, stats.distractionPct];
+    distributionChart.update();
+  }
+
+  function refreshDashboard() {
+    const filtered = filterEntries();
+    const stats = renderSummary(filtered);
+    renderTable(filtered);
+    renderCharts(filtered, stats);
+  }
+
+  function initCharts() {
+    if (!hasChart) {
+      document.querySelectorAll(".chart-area").forEach(el => {
+        el.innerHTML = '<div class="empty">Chart library unavailable in this environment.</div>';
+      });
+      return;
+    }
+
+    trendChart = new Chart(document.getElementById("trendChart"), {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [{
+          label: "Attention Score (%)",
+          data: [],
+          borderColor: "#4f46e5",
+          backgroundColor: "rgba(79, 70, 229, 0.12)",
+          borderWidth: 2,
+          pointRadius: 0,
+          fill: true,
+          tension: 0.28
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true, max: 100 } },
+        plugins: { legend: { display: true } }
+      }
+    });
+
+    distributionChart = new Chart(document.getElementById("distributionChart"), {
+      type: "doughnut",
+      data: {
+        labels: ["Attention", "Distraction"],
+        datasets: [{ data: [0, 0], backgroundColor: ["#16a34a", "#f59e0b"] }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: "bottom" } }
+      }
+    });
+  }
+
+  document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".filter-btn").forEach(el => el.classList.remove("active"));
+      btn.classList.add("active");
+      currentFilter = btn.dataset.filter;
+      document.getElementById("custom-range").style.display = currentFilter === "custom" ? "flex" : "none";
+      refreshDashboard();
+    });
+  });
+
+  document.getElementById("apply-custom").addEventListener("click", () => {
+    const start = document.getElementById("start-date").value;
+    const end = document.getElementById("end-date").value;
+    if (!start || !end) {
+      window.alert("Please select both start and end dates.");
+      return;
+    }
+    if (start > end) {
+      window.alert("Start date cannot be after end date.");
+      return;
+    }
+    refreshDashboard();
+  });
+
+  window.addEventListener("load", () => {
+    initCharts();
+    if (!ref) {
+      renderLive(null);
+      refreshDashboard();
+      return;
+    }
+
+    ref.on("value", snapshot => {
+      allEntries = toEntries(snapshot.val());
+      if (!allEntries.length) {
+        renderLive(null);
+        refreshDashboard();
+        return;
+      }
+
+      renderLive(allEntries[allEntries.length - 1]);
+      refreshDashboard();
+    });
   });
 </script>
 </body>
