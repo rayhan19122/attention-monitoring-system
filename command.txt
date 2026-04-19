@@ -1,0 +1,7 @@
+source venv/bin/activate
+python3 -c "
+from attention_detector import analyze_image
+import json
+result = analyze_image('/Users/rayhan/IoT/attention-monitor-rayhan/uploads/image_1776598681.jpg')
+print(json.dumps(result, indent=2))
+"

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,62 +7,253 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #f3f6ff;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --primary: #4f46e5;
-      --attention: #16a34a;
-      --distraction: #f59e0b;
-      --danger: #ef4444;
-      --border: #e5e7eb;
-      --shadow: 0 10px 30px rgba(79, 70, 229, 0.12);
-      --radius: 14px;
+    /* ── Dark theme (default) ─────────────────────── */
+    [data-theme="dark"] {
+      --bg-start: #0a0a1a;
+      --bg-mid: #111133;
+      --bg-end: #1a1a3e;
+      --glass: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.10);
+      --glass-hover: rgba(255, 255, 255, 0.08);
+      --text: #eef0ff;
+      --text-secondary: rgba(255, 255, 255, 0.50);
+      --primary: #a78bfa;
+      --primary-glow: rgba(167, 139, 250, 0.35);
+      --attention: #2dd4bf;
+      --attention-glow: rgba(45, 212, 191, 0.30);
+      --distraction: #fb923c;
+      --distraction-glow: rgba(251, 146, 60, 0.28);
+      --danger: #f87171;
+      --danger-glow: rgba(248, 113, 113, 0.30);
+      --circle-inner: rgba(10, 10, 26, 0.88);
+      --ring-track: rgba(255, 255, 255, 0.07);
+      --table-border: rgba(255, 255, 255, 0.06);
+      --table-hover: rgba(255, 255, 255, 0.03);
+      --filter-bg: rgba(167, 139, 250, 0.10);
+      --filter-border: rgba(167, 139, 250, 0.22);
+      --filter-text: #c4b5fd;
+      --input-bg: rgba(255, 255, 255, 0.06);
+      --alert-bg: rgba(248, 113, 113, 0.10);
+      --alert-border: rgba(248, 113, 113, 0.28);
+      --alert-text: #fca5a5;
+      --error-text: #fca5a5;
+      --orb1: #7c3aed;
+      --orb2: #0d9488;
+      --orb-opacity: 0.30;
+      --chart-grid: rgba(255, 255, 255, 0.05);
+      --chart-grid-x: rgba(255, 255, 255, 0.03);
+      --chart-tick: rgba(255, 255, 255, 0.45);
+      --chart-tick-x: rgba(255, 255, 255, 0.35);
+      --chart-legend: rgba(255, 255, 255, 0.55);
+      --chart-line: #a78bfa;
+      --chart-fill: rgba(167, 139, 250, 0.14);
+      --scrollbar-thumb: rgba(255, 255, 255, 0.12);
+      --picker-invert: invert(0.7);
+      --gradient-title: linear-gradient(135deg, #a78bfa, #e879f9, #2dd4bf);
+      --stat-current-accent: linear-gradient(180deg, #a78bfa, #7c3aed);
+      --stat-current-tint: rgba(167, 139, 250, 0.08);
+      --stat-attention-accent: linear-gradient(180deg, #2dd4bf, #0d9488);
+      --stat-attention-tint: rgba(45, 212, 191, 0.08);
+      --stat-distraction-accent: linear-gradient(180deg, #fb923c, #ea580c);
+      --stat-distraction-tint: rgba(251, 146, 60, 0.08);
+      --active-btn-bg: linear-gradient(135deg, #7c3aed, #a78bfa);
+      --apply-bg: linear-gradient(135deg, #0d9488, #2dd4bf);
+      --apply-text: #042f2e;
+      --apply-hover: linear-gradient(135deg, #2dd4bf, #0d9488);
+      --toggle-bg: rgba(255, 255, 255, 0.06);
+      --toggle-border: rgba(255, 255, 255, 0.12);
+      --toggle-hover: rgba(255, 255, 255, 0.10);
+      --doughnut-colors: #2dd4bf, #fb923c;
     }
+
+    /* ── Light theme ──────────────────────────────── */
+    [data-theme="light"] {
+      --bg-start: #eef1fa;
+      --bg-mid: #f4f6ff;
+      --bg-end: #f9faff;
+      --glass: rgba(255, 255, 255, 0.65);
+      --glass-border: rgba(100, 100, 180, 0.10);
+      --glass-hover: rgba(255, 255, 255, 0.80);
+      --text: #1a1640;
+      --text-secondary: rgba(26, 22, 64, 0.50);
+      --primary: #7c3aed;
+      --primary-glow: rgba(124, 58, 237, 0.18);
+      --attention: #0d9488;
+      --attention-glow: rgba(13, 148, 136, 0.16);
+      --distraction: #ea580c;
+      --distraction-glow: rgba(234, 88, 12, 0.16);
+      --danger: #dc2626;
+      --danger-glow: rgba(220, 38, 38, 0.16);
+      --circle-inner: rgba(255, 255, 255, 0.92);
+      --ring-track: rgba(0, 0, 0, 0.06);
+      --table-border: rgba(0, 0, 0, 0.06);
+      --table-hover: rgba(124, 58, 237, 0.03);
+      --filter-bg: rgba(124, 58, 237, 0.07);
+      --filter-border: rgba(124, 58, 237, 0.18);
+      --filter-text: #6d28d9;
+      --input-bg: rgba(255, 255, 255, 0.75);
+      --alert-bg: rgba(220, 38, 38, 0.06);
+      --alert-border: rgba(220, 38, 38, 0.18);
+      --alert-text: #991b1b;
+      --error-text: #b91c1c;
+      --orb1: #c4b5fd;
+      --orb2: #99f6e4;
+      --orb-opacity: 0.35;
+      --chart-grid: rgba(0, 0, 0, 0.05);
+      --chart-grid-x: rgba(0, 0, 0, 0.03);
+      --chart-tick: rgba(0, 0, 0, 0.45);
+      --chart-tick-x: rgba(0, 0, 0, 0.35);
+      --chart-legend: rgba(0, 0, 0, 0.50);
+      --chart-line: #7c3aed;
+      --chart-fill: rgba(124, 58, 237, 0.10);
+      --scrollbar-thumb: rgba(0, 0, 0, 0.12);
+      --picker-invert: none;
+      --gradient-title: linear-gradient(135deg, #7c3aed, #c026d3, #0d9488);
+      --stat-current-accent: linear-gradient(180deg, #8b5cf6, #6d28d9);
+      --stat-current-tint: rgba(124, 58, 237, 0.06);
+      --stat-attention-accent: linear-gradient(180deg, #14b8a6, #0d9488);
+      --stat-attention-tint: rgba(13, 148, 136, 0.06);
+      --stat-distraction-accent: linear-gradient(180deg, #fb923c, #ea580c);
+      --stat-distraction-tint: rgba(234, 88, 12, 0.05);
+      --active-btn-bg: linear-gradient(135deg, #6d28d9, #8b5cf6);
+      --apply-bg: linear-gradient(135deg, #0d9488, #14b8a6);
+      --apply-text: #f0fdfa;
+      --apply-hover: linear-gradient(135deg, #14b8a6, #0d9488);
+      --toggle-bg: rgba(0, 0, 0, 0.04);
+      --toggle-border: rgba(0, 0, 0, 0.08);
+      --toggle-hover: rgba(0, 0, 0, 0.07);
+      --doughnut-colors: #0d9488, #ea580c;
+    }
+
+    :root { --radius: 18px; }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: Inter, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background: radial-gradient(circle at top right, #dde7ff, var(--bg));
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-mid) 50%, var(--bg-end) 100%);
       color: var(--text);
       min-height: 100vh;
-      padding: 20px;
+      padding: 24px;
+      position: relative;
+      overflow-x: hidden;
+      transition: background 0.5s, color 0.3s;
     }
 
-    .container { max-width: 1200px; margin: 0 auto; }
+    /* Ambient floating orbs */
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: var(--orb-opacity);
+      z-index: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--orb1), transparent 70%);
+      top: -100px; right: -80px;
+      animation: float-orb 18s ease-in-out infinite alternate;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, var(--orb2), transparent 70%);
+      bottom: -60px; left: -60px;
+      animation: float-orb 22s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes float-orb {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(60px, -40px) scale(1.15); }
+    }
+
+    .container { max-width: 1260px; margin: 0 auto; position: relative; z-index: 1; }
+
+    /* Glass card mixin */
+    .glass {
+      background: var(--glass);
+      backdrop-filter: blur(22px) saturate(1.5);
+      -webkit-backdrop-filter: blur(22px) saturate(1.5);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      transition: background 0.3s, box-shadow 0.3s, border-color 0.3s;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    }
+    .glass:hover {
+      background: var(--glass-hover);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+      border-color: var(--glass-border);
+    }
 
     .header {
-      margin-bottom: 22px;
+      margin-bottom: 28px;
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
+      align-items: center;
       gap: 12px;
       flex-wrap: wrap;
     }
 
-    .header h1 { font-size: clamp(1.4rem, 3vw, 2.1rem); line-height: 1.2; }
-    .header p { color: var(--muted); margin-top: 6px; }
+    .header h1 {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 800;
+      line-height: 1.2;
+      background: var(--gradient-title);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header p { color: var(--text-secondary); margin-top: 6px; font-weight: 500; }
+
+    /* Theme toggle */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--toggle-bg);
+      border: 1px solid var(--toggle-border);
+      border-radius: 999px;
+      padding: 6px 14px 6px 12px;
+      cursor: pointer;
+      transition: background 0.3s, border-color 0.3s;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+    .theme-toggle:hover {
+      background: var(--toggle-hover);
+    }
+    .theme-toggle .icon {
+      font-size: 1.15rem;
+      line-height: 1;
+    }
+    [data-theme="dark"] .theme-toggle .label-light { display: none; }
+    [data-theme="light"] .theme-toggle .label-dark { display: none; }
+    [data-theme="dark"] .theme-toggle .icon-light { display: none; }
+    [data-theme="light"] .theme-toggle .icon-dark { display: none; }
 
     .alert {
       display: none;
       margin-bottom: 18px;
-      border-radius: 12px;
-      padding: 12px 14px;
-      border: 1px solid #fecaca;
-      color: #991b1b;
-      background: #fef2f2;
+      border-radius: 14px;
+      padding: 14px 18px;
+      border: 1px solid var(--alert-border);
+      color: var(--alert-text);
+      background: var(--alert-bg);
+      backdrop-filter: blur(16px);
       font-weight: 600;
+      font-size: 0.95rem;
+      transition: background 0.3s, border-color 0.3s, color 0.3s;
     }
 
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 18px;
+      padding: 22px;
       margin-bottom: 18px;
     }
 
@@ -73,48 +264,93 @@
       align-items: center;
     }
 
-    .filters strong { margin-right: 4px; }
+    .filters strong {
+      margin-right: 4px;
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
 
     .filter-btn,
     .apply-btn {
-      border: 1px solid #c7d2fe;
-      background: #eef2ff;
-      color: #3730a3;
+      border: 1px solid var(--filter-border);
+      background: var(--filter-bg);
+      color: var(--filter-text);
       border-radius: 999px;
-      padding: 8px 14px;
+      padding: 8px 16px;
       cursor: pointer;
       font-weight: 600;
-      transition: .2s ease;
+      font-size: 0.88rem;
+      font-family: inherit;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(8px);
     }
 
     .filter-btn:hover,
-    .apply-btn:hover { transform: translateY(-1px); }
+    .apply-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px var(--primary-glow);
+    }
 
     .filter-btn.active {
-      background: var(--primary);
-      border-color: var(--primary);
+      background: var(--active-btn-bg);
+      border-color: transparent;
       color: #fff;
+      box-shadow: 0 4px 22px var(--primary-glow);
+    }
+
+    .apply-btn {
+      background: var(--apply-bg);
+      border-color: transparent;
+      color: var(--apply-text);
+      font-weight: 700;
+    }
+    .apply-btn:hover {
+      box-shadow: 0 4px 16px var(--attention-glow);
+      background: var(--apply-hover);
     }
 
     .custom-range {
       display: none;
       width: 100%;
       align-items: center;
-      gap: 8px;
-      margin-top: 6px;
+      gap: 10px;
+      margin-top: 10px;
       flex-wrap: wrap;
     }
 
-    .custom-range input {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 10px;
+    .custom-range label {
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .custom-range input[type="datetime-local"] {
+      background: var(--input-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 10px 14px;
       color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.3s, color 0.3s;
+    }
+    .custom-range input[type="datetime-local"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    .custom-range input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+      filter: var(--picker-invert);
     }
 
     .inline-error {
       width: 100%;
-      color: #b91c1c;
+      color: var(--error-text);
       font-size: 0.84rem;
       font-weight: 600;
     }
@@ -122,24 +358,51 @@
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(180px, 1fr));
-      gap: 14px;
-      margin-bottom: 18px;
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
     .stat {
-      border-radius: 12px;
-      background: #fff;
-      border: 1px solid var(--border);
-      padding: 16px;
+      border-radius: 16px;
+      padding: 22px 22px 22px 26px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .stat small { color: var(--muted); font-weight: 600; }
-    .stat h3 { margin-top: 8px; font-size: clamp(1.6rem, 4vw, 2rem); }
-    .stat p { color: var(--muted); font-size: 0.87rem; margin-top: 4px; }
+    /* Left accent bar */
+    .stat::before {
+      content: "";
+      position: absolute;
+      top: 12px; left: 0;
+      width: 4px; height: calc(100% - 24px);
+      border-radius: 0 4px 4px 0;
+    }
+    .stat.current::before { background: var(--stat-current-accent); }
+    .stat.attention::before { background: var(--stat-attention-accent); }
+    .stat.distraction::before { background: var(--stat-distraction-accent); }
 
-    .stat.current h3 { color: var(--primary); }
-    .stat.attention h3 { color: var(--attention); }
-    .stat.distraction h3 { color: var(--distraction); }
+    /* Subtle colored background tint per stat */
+    .stat.current { background: var(--stat-current-tint); }
+    .stat.attention { background: var(--stat-attention-tint); }
+    .stat.distraction { background: var(--stat-distraction-tint); }
+
+    .stat small {
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .stat h3 {
+      margin-top: 8px;
+      font-size: clamp(1.8rem, 4vw, 2.2rem);
+      font-weight: 800;
+    }
+    .stat p { color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px; }
+
+    .stat.current h3 { color: var(--primary); text-shadow: 0 0 24px var(--primary-glow); }
+    .stat.attention h3 { color: var(--attention); text-shadow: 0 0 24px var(--attention-glow); }
+    .stat.distraction h3 { color: var(--distraction); text-shadow: 0 0 24px var(--distraction-glow); }
 
     .layout {
       display: grid;
@@ -150,78 +413,112 @@
     .span-2 { grid-column: span 2; }
 
     .section-title {
-      font-size: 1.05rem;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.82rem;
     }
 
     .live-wrap {
       display: grid;
       place-items: center;
-      gap: 12px;
+      gap: 16px;
     }
 
     .score-circle {
       --deg: 0deg;
-      width: 180px;
-      height: 180px;
+      width: 195px;
+      height: 195px;
       border-radius: 50%;
       display: grid;
       place-items: center;
-      font-size: 2.25rem;
+      font-size: 2.5rem;
       font-weight: 800;
-      color: var(--primary);
-      background: conic-gradient(var(--attention) var(--deg), #e5e7eb 0deg);
+      color: var(--text);
+      background: conic-gradient(var(--attention) var(--deg), var(--ring-track) 0deg);
       position: relative;
+      box-shadow: 0 0 50px var(--attention-glow), inset 0 0 20px rgba(0,0,0,0.1);
+      transition: box-shadow 0.4s, background 0.3s;
     }
 
     .score-circle::after {
       content: "";
       position: absolute;
-      width: 130px;
-      height: 130px;
+      width: 145px;
+      height: 145px;
       border-radius: 50%;
-      background: #fff;
-      border: 1px solid var(--border);
+      background: var(--circle-inner);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      transition: background 0.3s, border-color 0.3s;
     }
 
     .score-circle span { position: relative; z-index: 1; }
-    .score-circle.low { background: conic-gradient(var(--distraction) var(--deg), #e5e7eb 0deg); }
-    .score-circle.critical { background: conic-gradient(var(--danger) var(--deg), #e5e7eb 0deg); }
+    .score-circle.low {
+      background: conic-gradient(var(--distraction) var(--deg), var(--ring-track) 0deg);
+      box-shadow: 0 0 50px var(--distraction-glow), inset 0 0 20px rgba(0,0,0,0.1);
+    }
+    .score-circle.critical {
+      background: conic-gradient(var(--danger) var(--deg), var(--ring-track) 0deg);
+      box-shadow: 0 0 50px var(--danger-glow), inset 0 0 20px rgba(0,0,0,0.1);
+    }
 
     .counts {
       display: flex;
-      gap: 18px;
+      gap: 24px;
       flex-wrap: wrap;
       justify-content: center;
-      color: var(--muted);
+      color: var(--text-secondary);
+      font-size: 0.88rem;
     }
 
-    .counts b { display: block; color: var(--text); font-size: 1.2rem; }
+    .counts b {
+      display: block;
+      color: var(--text);
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
 
     .chart-area { height: 300px; }
 
     table { width: 100%; border-collapse: collapse; }
     th, td {
       text-align: left;
-      border-bottom: 1px solid var(--border);
-      padding: 10px 8px;
-      font-size: 0.92rem;
+      border-bottom: 1px solid var(--table-border);
+      padding: 12px 10px;
+      font-size: 0.9rem;
+      transition: background 0.2s;
     }
-    th { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    th {
+      color: var(--text-secondary);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+    tr:hover td {
+      background: var(--table-hover);
+    }
 
     .status-on { color: var(--attention); font-weight: 700; }
     .status-off { color: var(--distraction); font-weight: 700; }
-    .status-neutral { color: var(--muted); font-weight: 700; }
+    .status-neutral { color: var(--text-secondary); font-weight: 700; }
 
-    .empty { text-align: center; padding: 16px; color: var(--muted); }
+    .empty { text-align: center; padding: 20px; color: var(--text-secondary); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
 
     @media (max-width: 900px) {
       .layout { grid-template-columns: 1fr; }
       .span-2 { grid-column: auto; }
       .stats-grid { grid-template-columns: 1fr; }
-      .score-circle { width: 150px; height: 150px; }
-      .score-circle::after { width: 108px; height: 108px; }
+      .score-circle { width: 160px; height: 160px; }
+      .score-circle::after { width: 116px; height: 116px; }
     }
   </style>
 </head>
@@ -229,14 +526,20 @@
 <div class="container">
   <div class="header">
     <div>
-      <h1>📊 Smart Classroom Dashboard</h1>
+      <h1>Smart Classroom Dashboard</h1>
       <p>Real-time monitoring with historical attention insights</p>
     </div>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">
+      <span class="icon icon-dark">🌙</span>
+      <span class="icon icon-light">☀️</span>
+      <span class="label-dark">Dark</span>
+      <span class="label-light">Light</span>
+    </button>
   </div>
 
   <div class="alert" id="alert">⚠ Attention level is LOW! Consider engaging students.</div>
 
-  <div class="card">
+  <div class="card glass">
     <div class="filters">
       <strong>Timeframe</strong>
       <button class="filter-btn active" data-filter="live">Live</button>
@@ -245,8 +548,10 @@
       <button class="filter-btn" data-filter="week">Last Week</button>
       <button class="filter-btn" data-filter="custom">Custom</button>
       <div class="custom-range" id="custom-range">
-        <input type="date" id="start-date" aria-label="Start date">
-        <input type="date" id="end-date" aria-label="End date">
+        <label for="start-datetime">From</label>
+        <input type="datetime-local" id="start-datetime" aria-label="Start date and time">
+        <label for="end-datetime">To</label>
+        <input type="datetime-local" id="end-datetime" aria-label="End date and time">
         <button class="apply-btn" id="apply-custom" type="button">Apply</button>
         <div id="custom-error" class="inline-error" aria-live="polite"></div>
       </div>
@@ -254,17 +559,17 @@
   </div>
 
   <div class="stats-grid">
-    <div class="stat current">
-      <small>Current Score</small>
-      <h3 id="current-score">--</h3>
-      <p>Latest real-time reading</p>
+    <div class="stat glass current">
+      <small>Students Present</small>
+      <h3 id="students-present">--</h3>
+      <p id="students-period">Max detected</p>
     </div>
-    <div class="stat attention">
+    <div class="stat glass attention">
       <small>Total Attention %</small>
       <h3 id="total-attention">--</h3>
       <p id="attention-period">For Live</p>
     </div>
-    <div class="stat distraction">
+    <div class="stat glass distraction">
       <small>Total Distraction %</small>
       <h3 id="total-distraction">--</h3>
       <p id="distraction-period">For Live</p>
@@ -272,7 +577,7 @@
   </div>
 
   <div class="layout">
-    <div class="card">
+    <div class="card glass">
       <div class="section-title">Live Attention Score</div>
       <div class="live-wrap">
         <div class="score-circle" id="score-circle" style="--deg:0deg"><span id="score-value">0%</span></div>
@@ -284,17 +589,17 @@
       </div>
     </div>
 
-    <div class="card">
+    <div class="card glass">
       <div class="section-title">Attention Distribution</div>
       <div class="chart-area"><canvas id="distributionChart"></canvas></div>
     </div>
 
-    <div class="card span-2">
+    <div class="card glass span-2">
       <div class="section-title">Attention Trend</div>
       <div class="chart-area"><canvas id="trendChart"></canvas></div>
     </div>
 
-    <div class="card span-2">
+    <div class="card glass span-2">
       <div class="section-title">Recent Readings</div>
       <table>
         <thead>
@@ -347,6 +652,53 @@
     custom: "Custom Range"
   };
 
+  /* ── Theme toggle ─────────────────────────────── */
+  function getThemeVars() {
+    const s = getComputedStyle(document.documentElement);
+    return {
+      grid: s.getPropertyValue("--chart-grid").trim(),
+      gridX: s.getPropertyValue("--chart-grid-x").trim(),
+      tick: s.getPropertyValue("--chart-tick").trim(),
+      tickX: s.getPropertyValue("--chart-tick-x").trim(),
+      legend: s.getPropertyValue("--chart-legend").trim(),
+      line: s.getPropertyValue("--chart-line").trim(),
+      fill: s.getPropertyValue("--chart-fill").trim(),
+      attention: s.getPropertyValue("--attention").trim(),
+      distraction: s.getPropertyValue("--distraction").trim()
+    };
+  }
+
+  function applyChartTheme() {
+    if (!trendChart || !distributionChart) return;
+    const v = getThemeVars();
+
+    trendChart.options.scales.y.grid.color = v.grid;
+    trendChart.options.scales.y.ticks.color = v.tick;
+    trendChart.options.scales.x.grid.color = v.gridX;
+    trendChart.options.scales.x.ticks.color = v.tickX;
+    trendChart.options.plugins.legend.labels.color = v.legend;
+    trendChart.data.datasets[0].borderColor = v.line;
+    trendChart.data.datasets[0].backgroundColor = v.fill;
+    trendChart.update();
+
+    distributionChart.data.datasets[0].backgroundColor = [v.attention, v.distraction];
+    distributionChart.options.plugins.legend.labels.color = v.legend;
+    distributionChart.update();
+  }
+
+  function setTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("dashboard-theme", theme);
+    // Allow CSS transition to settle, then update charts
+    requestAnimationFrame(() => applyChartTheme());
+  }
+
+  // Restore saved preference or default to dark
+  (function initTheme() {
+    const saved = localStorage.getItem("dashboard-theme") || "dark";
+    document.documentElement.setAttribute("data-theme", saved);
+  })();
+
   function toEntries(data) {
     return Object.values(data || {})
       .filter(item => item && Number.isFinite(item.timestamp))
@@ -381,12 +733,12 @@
     if (currentFilter === "week") return { start: now - 604800, end: now };
 
     if (currentFilter === "custom") {
-      const startValue = document.getElementById("start-date").value;
-      const endValue = document.getElementById("end-date").value;
+      const startValue = document.getElementById("start-datetime").value;
+      const endValue = document.getElementById("end-datetime").value;
       if (!startValue || !endValue) return null;
 
-      const start = Math.floor(new Date(startValue + "T00:00:00").getTime() / 1000);
-      const end = Math.floor(new Date(endValue + "T23:59:59").getTime() / 1000);
+      const start = Math.floor(new Date(startValue).getTime() / 1000);
+      const end = Math.floor(new Date(endValue).getTime() / 1000);
       return { start, end };
     }
 
@@ -407,7 +759,6 @@
 
   function renderLive(latest) {
     if (!latest) {
-      document.getElementById("current-score").textContent = "--";
       document.getElementById("score-value").textContent = "0%";
       document.getElementById("attentive").textContent = "0";
       document.getElementById("distracted").textContent = "0";
@@ -423,7 +774,6 @@
     const attentive = Number(latest?.attentive) || 0;
     const distracted = Number(latest?.distracted) || 0;
 
-    document.getElementById("current-score").textContent = score + "%";
     document.getElementById("score-value").textContent = score + "%";
     document.getElementById("attentive").textContent = attentive;
     document.getElementById("distracted").textContent = distracted;
@@ -447,6 +797,14 @@
   function renderSummary(filtered) {
     const stats = calcStats(filtered);
     const label = periodLabel[currentFilter] || "Live";
+
+    // Max students detected across all readings in the period
+    const maxStudents = filtered.length
+      ? Math.max(...filtered.map(r => (Number(r.attentive) || 0) + (Number(r.distracted) || 0)))
+      : 0;
+    document.getElementById("students-present").textContent = filtered.length ? maxStudents : "--";
+    document.getElementById("students-period").textContent = filtered.length ? `Peak in ${label}` : "Max detected";
+
     document.getElementById("total-attention").textContent = `${stats.attentionPct}%`;
     document.getElementById("total-distraction").textContent = `${stats.distractionPct}%`;
     document.getElementById("attention-period").textContent = `For ${label}`;
@@ -504,6 +862,8 @@
       return;
     }
 
+    const v = getThemeVars();
+
     trendChart = new Chart(document.getElementById("trendChart"), {
       type: "line",
       data: {
@@ -511,19 +871,35 @@
         datasets: [{
           label: "Attention Score (%)",
           data: [],
-          borderColor: "#4f46e5",
-          backgroundColor: "rgba(79, 70, 229, 0.12)",
-          borderWidth: 2,
+          borderColor: v.line,
+          backgroundColor: (ctx) => {
+            const chart = ctx.chart;
+            const { ctx: c, chartArea } = chart;
+            if (!chartArea) return v.fill;
+            const grad = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+            grad.addColorStop(0, v.fill);
+            grad.addColorStop(1, "transparent");
+            return grad;
+          },
+          borderWidth: 2.5,
           pointRadius: 0,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: v.line,
+          pointHoverBorderColor: "#fff",
+          pointHoverBorderWidth: 2,
           fill: true,
-          tension: 0.28
+          tension: 0.35
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: { y: { beginAtZero: true, max: 100 } },
-        plugins: { legend: { display: true } }
+        interaction: { intersect: false, mode: "index" },
+        scales: {
+          y: { beginAtZero: true, max: 100, grid: { color: v.grid }, ticks: { color: v.tick } },
+          x: { grid: { color: v.gridX }, ticks: { color: v.tickX, maxTicksLimit: 12 } }
+        },
+        plugins: { legend: { labels: { color: v.legend, usePointStyle: true, pointStyle: "circle" } } }
       }
     });
 
@@ -531,12 +907,13 @@
       type: "doughnut",
       data: {
         labels: ["Attention", "Distraction"],
-        datasets: [{ data: [0, 0], backgroundColor: ["#16a34a", "#f59e0b"] }]
+        datasets: [{ data: [0, 0], backgroundColor: [v.attention, v.distraction], borderColor: "transparent", borderWidth: 0, hoverOffset: 8 }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { position: "bottom" } }
+        cutout: "68%",
+        plugins: { legend: { position: "bottom", labels: { color: v.legend, padding: 18, usePointStyle: true, pointStyle: "circle" } } }
       }
     });
   }
@@ -553,17 +930,17 @@
   });
 
   document.getElementById("apply-custom").addEventListener("click", () => {
-    const start = document.getElementById("start-date").value;
-    const end = document.getElementById("end-date").value;
+    const start = document.getElementById("start-datetime").value;
+    const end = document.getElementById("end-datetime").value;
     const customError = document.getElementById("custom-error");
 
     if (!start || !end) {
-      customError.textContent = "Please select both start and end dates.";
+      customError.textContent = "Please select both start and end date/time.";
       return;
     }
 
     if (start > end) {
-      customError.textContent = "Start date cannot be after end date.";
+      customError.textContent = "Start date/time cannot be after end date/time.";
       return;
     }
 
@@ -571,7 +948,7 @@
     refreshDashboard();
   });
 
-  ["start-date", "end-date"].forEach(id => {
+  ["start-datetime", "end-datetime"].forEach(id => {
     document.getElementById(id).addEventListener("change", () => {
       document.getElementById("custom-error").textContent = "";
     });
@@ -579,6 +956,13 @@
 
   window.addEventListener("load", () => {
     initCharts();
+
+    // Theme toggle button
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      setTheme(current === "dark" ? "light" : "dark");
+    });
+
     if (!ref) {
       renderLive(null);
       refreshDashboard();
